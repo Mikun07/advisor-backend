@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "build": "NODE_ENV=production ./node_modules/.bin/netlify-lambda serve src"
+    "build": "node index.js"
   },
   "keywords": [],
   "author": "",
