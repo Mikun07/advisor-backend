@@ -1,14 +1,35 @@
-const dbInstance = require("../config/db");
+// const dbInstance = require("../config/db");
+const { MongoClient, ServerApiVersion } = require("mongodb");
+
+async function getCollection() {
+  const client = new MongoClient(process.env.MONGO_URI, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    },
+  });
+
+  try {
+   const connection = await client.connect();
+    const db = connection.db("advisory");
+    const collection = db.collection("stocks");
+    return collection;
+  } catch(error) {
+    throw error
+  }
+}
 
 module.exports = {
   getAllStocks: async function () {
     try {
-      const stockModel = await dbInstance.instance.model("Stock");
-      const data = await stockModel.find({});
+        const stocks = await getCollection();
+        const data = await stocks.find({}).toArray();
       return {
         success: true,
         message: "Stock List Retrieved",
         data,
+        stocks
       };
     } catch (error) {
       console.log(`Error querying stocks: ${error}`);
@@ -22,8 +43,8 @@ module.exports = {
 
   getStockByRiskScore: async function (riskScore) {
     try {
-      const stockModel = await dbInstance.instance.model("Stock");
-      const data = await stockModel.findOne({
+      const stocks = await getCollection();
+      const data = await stocks.findOne({
         "Risk Score/Tolerence": parseInt(riskScore),
       });
       return {
